@@ -47,7 +47,19 @@ To reach a OpenStack instance inside the IaaS machine from the PaaS machine:
 - set a floating IP for the OpenStack instance
 - `sudo ip route add 172.24.4.0/24 via 10.235.1.103` in the PaaS machine: add a route to reach the OpenStack instance's floating IP via the IaaS machine
 
-To reack a Docker container in the PaaS machine frome the IaaS machine:
+To reach a Docker container in the PaaS machine frome the IaaS machine:
 - expose the service of the container from the .yaml file (see exercise e17)
 - `sudo ip route add 172.17.0.0/24 via 10.235.1.203`in the IaaS machine: add a route to reach the container's master IP via the PaaS machine
 - `sudo iptables -I DOCKER-USER -i ens3 -o docker0 -j ACCEPT` in the PaaS machine: allow packets from interface ens3 (from outside) to reach the interface docker0, where there is the container
+
+## Iaas machine setup
+Setup for the IaaS machine will be done in three steps. The first step is to run
+```bash
+bash openstack_project_preliminary_creation.sh
+```
+This script will create the required settings for the whole IaaS part, and needs to be run only the first time when setting up the whole project.
+The by running:
+```bash
+bash instance_creation.sh
+```
+The actual openstack reachable server, based on ubuntu and running the mqtt subscriber, will be created. It will rely on the settings created before by the aforementioned script, and so needs to be run after it. It also contains a call to the cloud-init-mosquitto_subscriber.sh which will take care of handling and downloading all the needed dependencies and start listening for incoming mqtt messages from the appropriate paas address.
