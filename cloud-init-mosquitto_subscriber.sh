@@ -6,11 +6,9 @@
 #NOTE: do not run by itself, we need to specify the hostname of the mosquitto mqtt broker
 #running inside the kubernetes cluster in the paas machine
 
-apt-get update
-apt-get install -y wget software-properties-common
 apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
 apt-get update
 apt-get install -y mosquitto mosquitto-clients
-mosquitto_sub -h HOSTNAME -t weatherStation  
+#mosquitto_sub -h HOSTNAME -t weatherStation  
 
 exit 0

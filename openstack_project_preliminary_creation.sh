@@ -58,5 +58,14 @@ openstack security group rule create ssh-in \
 openstack security group rule create mqtt-in \
     --protocol tcp --dst-port 1883:1883 --remote-ip 0.0.0.0/0
 
+# Generate key
+ mkdir -p "${HOME}/.ssh"
+ ssh-keygen -t rsa -b 4096 -N "" \
+ -C "${NAME:=eval}" \
+ -f "${HOME}"/.ssh/id_rsa
+
+# Create keypair
+openstack keypair create --public-key "${HOME}/.ssh/id_rsa.pub" eval
+
 # Finish
 echo Preliminary settings established, plese use the instance creation script now.

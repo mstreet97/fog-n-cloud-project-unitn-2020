@@ -3,15 +3,6 @@ PROJECTN=mqtt_subscriber
 . /home/stack/devstack/openrc
 . ${PROJECTN}-openrc.sh
 
-# Generate key
- mkdir -p "${HOME}/.ssh"
- ssh-keygen -t rsa -b 4096 -N "" \
- -C "${NAME:=eval}" \
- -f "${HOME}"/.ssh/id_rsa
-
-# Create keypair
-openstack keypair create --public-key "${HOME}/.ssh/id_rsa.pub" eval
-
 # Server creation
 openstack server create \
 --flavor micro.ubuntu \
