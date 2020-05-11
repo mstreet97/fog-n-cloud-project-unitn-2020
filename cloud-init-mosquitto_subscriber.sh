@@ -11,7 +11,6 @@ apt-get install -y wget software-properties-common
 apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
 apt-get update
 apt-get install -y mosquitto mosquitto-clients
-ip route add 172.17.0.0/24 via 10.235.1.203 #To reach the paas machine
 mosquitto_sub -h HOSTNAME -t weatherStation  
 
 exit 0
