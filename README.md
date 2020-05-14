@@ -62,4 +62,4 @@ The by running:
 ```bash
 bash instance_creation.sh
 ```
-The actual openstack reachable server, based on ubuntu and running the mqtt subscriber, will be created. It will rely on the settings created before by the aforementioned script, and so needs to be run after it. It also contains a call to the cloud-init-mosquitto_subscriber.sh which will take care of handling and downloading all the needed dependencies and start listening for incoming mqtt messages from the appropriate paas address.
+The actual openstack reachable server, based on ubuntu and running the mqtt subscriber, will be created. It will rely on the settings created before by the aforementioned script, and so needs to be run after it. It also contains a call to the cloud-init-mosquitto_subscriber.sh which will take care of handling and downloading all the needed dependencies and start listening for incoming mqtt messages from the appropriate PaaS address.

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    io.kompose.service: forecast
+  name: forecast
+spec:
+  containers:
+  - args:
+    - bash
+    - -c
+    - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
+      ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
+      mosquitto-clients curl && while true; do curl wttr.in/Trento > weatherFile;
+      mosquitto_pub -h mosquitto -t weatherStation -f weatherFile; sleep 300; done'
+    image: ubuntu
+    name: forecast
+    resources: {}
+  restartPolicy: OnFailure
+status: {}
