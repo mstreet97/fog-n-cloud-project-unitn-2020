@@ -1,0 +1,150 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mqtt-conf
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+
+---
+apiVersion: v1
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: weather-station
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+      name: mosquitto
+    spec:
+      ################################################################### volume
+      volumes:
+      - name: mqtt-conf
+        persistentVolumeClaim:
+          claimName: mqtt-conf
+
+      hostname: mosquitto
+      containers:
+      ###################################################### mosquitto container
+      - name: mosquitto
+        image: eclipse-mosquitto
+        ports:
+        - containerPort: 1883
+        volumeMounts:
+        - mountPath: /mosquitto/mosquitto.conf
+          name: mqtt-conf
+
+
+
+---
+apiVersion: v1
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: forecast
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: forecast
+      name: forecast
+    spec:
+      containers:
+      ####################################################### forecast container
+      - name: forecast
+        image: ubuntu
+        command:
+        - bash
+        - -c
+        - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
+          ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
+          mosquitto-clients curl && while true; do curl wttr.in/Trento > weatherFile;
+          mosquitto_pub -h mosquitto -t weatherStation -f weatherFile; sleep 300; done'
+
+
+
+---
+apiVersion: v1
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: sunrisesunset
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sunrisesunset
+      name: sunrisesunset
+    spec:
+      containers:
+      ################################################## sunrisesunset container
+      - name: sunrisesunset
+        image: ubuntu
+        command:
+        - bash
+        - -c
+        - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
+          ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
+          nodejs mosquitto-clients && cd ~ && wget https://raw.githubusercontent.com/mstreet97/dncs-swarm-management/master/sunriseSunset.js
+          && while true; do node sunriseSunset.js Trento IT > sunriseFile; mosquitto_pub
+          -h mosquitto -t weatherStation -f sunriseFile; sleep 300; done'
+
+
+
+
+---
+apiVersion: v1
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: weathersubscriber
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: weathersubscriber
+      name: weathersubscriber
+    spec:
+      containers:
+      ############ weathersubscriber TMP for testing
+      - name: weathersubscriber
+        image: ubuntu
+        command:
+        - bash
+        - -c
+        - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
+          ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
+          nodejs mosquitto-clients && cd ~ && mosquitto_sub -h mosquitto -t weatherStation'
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "weather-station"
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: NodePort
+  ports:
+  - port: 1883
+    nodePort: 30000
+    targetPort: 1883
+  selector:
+    name: mosquitto
