@@ -14,17 +14,19 @@ status: {}
 ---
 apiVersion: v1
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
-  name: weather-station
+  name: mosquitto
   namespace: default
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: mosquitto
   template:
     metadata:
       labels:
-        app: mosquitto
-      name: mosquitto
+        name: mosquitto
     spec:
       ################################################################### volume
       volumes:
@@ -48,17 +50,19 @@ spec:
 ---
 apiVersion: v1
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: forecast
   namespace: default
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: forecast
   template:
     metadata:
       labels:
-        app: forecast
-      name: forecast
+        name: forecast
     spec:
       containers:
       ####################################################### forecast container
@@ -77,17 +81,19 @@ spec:
 ---
 apiVersion: v1
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: sunrisesunset
   namespace: default
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: sunrisesunset
   template:
     metadata:
       labels:
-        app: sunrisesunset
-      name: sunrisesunset
+        name: sunrisesunset
     spec:
       containers:
       ################################################## sunrisesunset container
@@ -108,17 +114,19 @@ spec:
 ---
 apiVersion: v1
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: weathersubscriber
   namespace: default
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: weathersubscriber
   template:
     metadata:
       labels:
-        app: weathersubscriber
-      name: weathersubscriber
+        name: weathersubscriber
     spec:
       containers:
       ############ weathersubscriber TMP for testing
@@ -137,7 +145,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: "weather-station"
+  name: mosquitto
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:

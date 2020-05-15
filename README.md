@@ -52,7 +52,7 @@ To reach a Docker container in the PaaS machine frome the IaaS machine:
 - `sudo ip route add 172.17.0.0/24 via 10.235.1.203`in the IaaS machine: add a route to reach the container's master IP via the PaaS machine
 - `sudo iptables -I DOCKER-USER -i ens3 -o docker0 -j ACCEPT` in the PaaS machine: allow packets from interface ens3 (from outside) to reach the interface docker0, where there is the container
 
-## Iaas machine setup
+## IaaS machine setup
 Setup for the IaaS machine will be done in three steps. The first step is to run
 ```bash
 bash openstack_project_preliminary_creation.sh
@@ -63,3 +63,10 @@ The by running:
 bash instance_creation.sh
 ```
 The actual openstack reachable server, based on ubuntu and running the mqtt subscriber, will be created. It will rely on the settings created before by the aforementioned script, and so needs to be run after it. It also contains a call to the cloud-init-mosquitto_subscriber.sh which will take care of handling and downloading all the needed dependencies and start listening for incoming mqtt messages from the appropriate PaaS address.
+
+## PaaS machine setup
+To setup the PaaS machine a running cluster of Kubernetes is needed. For the project on the PaaS machine we used kind, while locally I used minikube, but should be working on whatever method you see fit. The deployment.yaml file also includes a deployment for the weather subscriber, to be able to check if the mqtt broker and the sonsors are working by inside the kubernetes cluster. To deploy everything just run
+```bash
+kubectl create -f deployment.yaml
+```
+Other than the needed deployments, a service and a persistent volume for the mosquitto broker will be created.
