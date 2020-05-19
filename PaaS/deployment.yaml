@@ -104,7 +104,7 @@ spec:
         - -c
         - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
           ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
-          nodejs mosquitto-clients && cd ~ && wget https://raw.githubusercontent.com/mstreet97/dncs-swarm-management/master/sunriseSunset.js
+          nodejs mosquitto-clients && cd ~ && wget https://raw.githubusercontent.com/mstreet97/fog-n-cloud-project-unitn-2020/master/sunriseSunset.js
           && while true; do node sunriseSunset.js Trento IT > sunriseFile; mosquitto_pub
           -h mosquitto -t weatherStation -f sunriseFile; sleep 300; done'
 
