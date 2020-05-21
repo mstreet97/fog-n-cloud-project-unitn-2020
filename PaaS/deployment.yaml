@@ -73,8 +73,9 @@ spec:
         - -c
         - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
           ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
-          mosquitto-clients curl && while true; do curl wttr.in/Trento > weatherFile;
-          mosquitto_pub -h mosquitto -t weatherStation -f weatherFile; sleep 300; done'
+          mosquitto-clients curl && cd ~ && wget https://raw.githubusercontent.com/mstreet97/fog-n-cloud-project-unitn-2020/master/forecast.sh
+          && chmod +x forecast.sh && while true; do ./forecast.sh > weatherFile;
+          mosquitto_pub -h mosquitto -t weatherStation -f weatherFile; sleep 60; done'
 
 
 
@@ -106,7 +107,7 @@ spec:
           ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
           nodejs mosquitto-clients && cd ~ && wget https://raw.githubusercontent.com/mstreet97/fog-n-cloud-project-unitn-2020/master/sunriseSunset.js
           && while true; do node sunriseSunset.js Trento IT > sunriseFile; mosquitto_pub
-          -h mosquitto -t weatherStation -f sunriseFile; sleep 300; done'
+          -h mosquitto -t weatherStation -f sunriseFile; sleep 60; done'
 
 
 
@@ -137,8 +138,8 @@ spec:
         - -c
         - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
           ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
-          mosquitto-clients && cd ~ && while true; do echo "The MQTT brocker is alive at " > aliveFile;
-          date >> aliveFile; mosquitto_pub -h mosquitto -t alive -f aliveFile; sleep 5; done'
+          mosquitto-clients && cd ~ && while true; do echo -n "The MQTT brocker is alive at " > aliveFile;
+          date >> aliveFile; mosquitto_pub -h mosquitto -t alive -f aliveFile; sleep 2; done'
 
 
 
