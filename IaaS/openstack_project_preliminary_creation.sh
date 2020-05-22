@@ -10,6 +10,8 @@ openstack project create \
   --description "Mqtt Subscriber for mosquitto broker in paas machine" \
   "${PROJECTN}"
 
+
+###################################################################### stud user
 # Stud user definition and addition to the project
 openstack user create --password "${PASSWORD}" "${USERNAME}"
 openstack role add --project "${PROJECTN}" --user "${USERNAME}" "member"
@@ -23,7 +25,22 @@ echo export OS_PASSWORD=${PASSWORD} >> ${PROJECTN}-openrc.sh
 echo export OS_AUTH_URL=http://10.235.1.103/identity >> ${PROJECTN}-openrc.sh
 echo export OS_IDENTITY_API_VERSION=3 >> ${PROJECTN}-openrc.sh
 
-# TODO: aggiungere creazione username eval e creazione openrc per eval
+
+###################################################################### eval user
+# Eval user definition and addition to the project
+openstack user create --password "eval" "eval"
+openstack role add --project "${PROJECTN}" --user "eval" "reader"
+
+# Create openrc file
+echo export OS_PROJECT_DOMAIN_NAME=default >> ${PROJECTN}-openrc.sh
+echo export OS_USER_DOMAIN_NAME=default >> ${PROJECTN}-openrc.sh
+echo export OS_PROJECT_NAME=${PROJECTN} >> ${PROJECTN}-openrc.sh
+echo export OS_USERNAME=eval >> ${PROJECTN}-openrc.sh
+echo export OS_PASSWORD=eval >> ${PROJECTN}-openrc.sh
+echo export OS_AUTH_URL=http://10.235.1.103/identity >> ${PROJECTN}-openrc.sh
+echo export OS_IDENTITY_API_VERSION=3 >> ${PROJECTN}-openrc.sh
+
+
 
 # Ubuntu image creation
 wget -P /var/tmp -c https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
@@ -63,6 +80,8 @@ openstack security group rule create mqtt-in \
  ssh-keygen -t rsa -b 4096 -N "" \
  -C "${NAME:=eval}" \
  -f "${HOME}"/.ssh/id_rsa
+
+ echo "Key created in ${HOME}/.ssh. Please copy the key in /home/eval/.ssh with su - eval"
 
 # Create keypair
 openstack keypair create --public-key "${HOME}/.ssh/id_rsa.pub" eval
