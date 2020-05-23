@@ -1,0 +1,192 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mqtt-conf
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+
+---
+apiVersion: v1
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mosquitto
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: mosquitto
+  template:
+    metadata:
+      labels:
+        name: mosquitto
+    spec:
+      ################################################################### volume
+      volumes:
+      - name: mqtt-conf
+        persistentVolumeClaim:
+          claimName: mqtt-conf
+
+      hostname: mosquitto
+      containers:
+      ###################################################### mosquitto container
+      - name: mosquitto
+        image: eclipse-mosquitto
+        ports:
+        - containerPort: 1883
+        volumeMounts:
+        - mountPath: /mosquitto/mosquitto.conf
+          name: mqtt-conf
+
+
+
+---
+apiVersion: v1
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: forecast
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: forecast
+  template:
+    metadata:
+      labels:
+        name: forecast
+    spec:
+      containers:
+      ####################################################### forecast container
+      - name: forecast
+        image: ubuntu
+        command:
+        - bash
+        - -c
+        - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
+          ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
+          mosquitto-clients curl && cd ~ && wget https://raw.githubusercontent.com/mstreet97/fog-n-cloud-project-unitn-2020/master/forecast.sh
+          && chmod +x forecast.sh && while true; do ./forecast.sh > weatherFile;
+          mosquitto_pub -h mosquitto -t weatherStation -f weatherFile; sleep 60; done'
+
+
+
+---
+apiVersion: v1
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: temperature
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: temperature
+  template:
+    metadata:
+      labels:
+        name: temperature
+    spec:
+      containers:
+      ####################################################### temperature container
+      - name: temperature
+        image: ubuntu
+        command:
+        - bash
+        - -c
+        - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
+          ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
+          mosquitto-clients curl && cd ~ && wget https://raw.githubusercontent.com/mstreet97/fog-n-cloud-project-unitn-2020/master/temperature.sh
+          && chmod +x temperature.sh && while true; do ./temperature.sh > weatherFile;
+          mosquitto_pub -h mosquitto -t weatherStation -f weatherFile; sleep 60; done'
+
+
+
+---
+apiVersion: v1
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: sunrisesunset
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: sunrisesunset
+  template:
+    metadata:
+      labels:
+        name: sunrisesunset
+    spec:
+      containers:
+      ################################################## sunrisesunset container
+      - name: sunrisesunset
+        image: ubuntu
+        command:
+        - bash
+        - -c
+        - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
+          ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
+          nodejs mosquitto-clients && cd ~ && wget https://raw.githubusercontent.com/mstreet97/fog-n-cloud-project-unitn-2020/master/sunriseSunset.js
+          && while true; do node sunriseSunset.js Trento IT > sunriseFile; mosquitto_pub
+          -h mosquitto -t weatherStation -f sunriseFile; sleep 60; done'
+
+
+
+
+---
+apiVersion: v1
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: pinger
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: pinger
+  template:
+    metadata:
+      labels:
+        name: pinger
+    spec:
+      containers:
+      ######################################################### pinger container
+      - name: pinger
+        image: ubuntu
+        command:
+        - bash
+        - -c
+        - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
+          ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
+          mosquitto-clients && cd ~ && while true; do echo -n "The MQTT brocker is alive at " > aliveFile;
+          date >> aliveFile; mosquitto_pub -h mosquitto -t alive -f aliveFile; sleep 2; done'
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosquitto
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: NodePort
+  ports:
+  - port: 1883
+    nodePort: 30000
+    targetPort: 1883
+  selector:
+    name: mosquitto
