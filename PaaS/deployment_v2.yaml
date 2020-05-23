@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: temperature
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: temperature
+  template:
+    metadata:
+      labels:
+        name: temperature
+    spec:
+      containers:
+      #################################################### temperature container
+      - name: temperature
+        image: ubuntu
+        command:
+        - bash
+        - -c
+        - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
+          ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
+          mosquitto-clients curl && cd ~ && wget https://raw.githubusercontent.com/mstreet97/fog-n-cloud-project-unitn-2020/master/temperature.sh
+          && chmod +x temperature.sh && while true; do ./temperature.sh > temperatureFile;
+          mosquitto_pub -h mosquitto -t weatherStation -f temperatureFile; sleep 60; done'

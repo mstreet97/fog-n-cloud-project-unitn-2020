@@ -81,8 +81,6 @@ openstack security group rule create mqtt-in \
  -C "${NAME:=eval}" \
  -f "${HOME}"/.ssh/id_rsa
 
- echo "Key created in ${HOME}/.ssh. Please copy the key in /home/eval/.ssh with su - eval"
-
 # Create keypair
 openstack keypair create --public-key "${HOME}/.ssh/id_rsa.pub" eval
 
