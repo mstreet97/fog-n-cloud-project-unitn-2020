@@ -1,4 +1,4 @@
-PROJECTN=mqtt_subscriber
+PROJECTN=weather_station
 
 . /home/stack/devstack/openrc
 . ${PROJECTN}-openrc.sh

@@ -1,13 +1,13 @@
 . /home/stack/devstack/openrc
 . /home/stack/devstack/accrc/admin/admin
 
-USERNAME=stud
+USERNAME=student
 PASSWORD=password
-PROJECTN=mqtt_subscriber
+PROJECTN=weather_station
 
 # Project creation
 openstack project create \
-  --description "Mqtt Subscriber for mosquitto broker in paas machine" \
+  --description "Mqtt Subscribers for mosquitto broker in paas machine" \
   "${PROJECTN}"
 
 
@@ -32,13 +32,13 @@ openstack user create --password "eval" "eval"
 openstack role add --project "${PROJECTN}" --user "eval" "reader"
 
 # Create openrc file
-echo export OS_PROJECT_DOMAIN_NAME=default >> ${PROJECTN}-openrc.sh
-echo export OS_USER_DOMAIN_NAME=default >> ${PROJECTN}-openrc.sh
-echo export OS_PROJECT_NAME=${PROJECTN} >> ${PROJECTN}-openrc.sh
-echo export OS_USERNAME=eval >> ${PROJECTN}-openrc.sh
-echo export OS_PASSWORD=eval >> ${PROJECTN}-openrc.sh
-echo export OS_AUTH_URL=http://10.235.1.103/identity >> ${PROJECTN}-openrc.sh
-echo export OS_IDENTITY_API_VERSION=3 >> ${PROJECTN}-openrc.sh
+echo export OS_PROJECT_DOMAIN_NAME=default >> eval-${PROJECTN}-openrc.sh
+echo export OS_USER_DOMAIN_NAME=default >> eval-${PROJECTN}-openrc.sh
+echo export OS_PROJECT_NAME=${PROJECTN} >> eval-${PROJECTN}-openrc.sh
+echo export OS_USERNAME=eval >> eval-${PROJECTN}-openrc.sh
+echo export OS_PASSWORD=eval >> eval-${PROJECTN}-openrc.sh
+echo export OS_AUTH_URL=http://10.235.1.103/identity >> eval-${PROJECTN}-openrc.sh
+echo export OS_IDENTITY_API_VERSION=3 >> eval-${PROJECTN}-openrc.sh
 
 
 
@@ -52,7 +52,7 @@ ubuntu-bionic-18.04
 openstack flavor create --ram 512 --disk 5  --ephemeral 5 --vcpus 1 --public micro.ubuntu
 
 # Source openrc file
-. ${PROJECTN}-openrc.sh
+. ${HOME}/${PROJECTN}-openrc.sh
 
 # Network creation
 openstack network create subscriber_network
