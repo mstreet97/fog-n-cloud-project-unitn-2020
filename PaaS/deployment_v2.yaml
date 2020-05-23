@@ -23,6 +23,7 @@ spec:
         - -c
         - ' apt-get update && apt-get install -y wget software-properties-common && apt-add-repository
           ppa:mosquitto-dev/mosquitto-ppa && apt-get update && apt-get install -y mosquitto
-          mosquitto-clients curl && cd ~ && wget https://raw.githubusercontent.com/mstreet97/fog-n-cloud-project-unitn-2020/master/temperature.sh
-          && chmod +x temperature.sh && while true; do ./temperature.sh > temperatureFile;
+          mosquitto-clients curl && cd ~ &&
+          while [ ! -f temperature.sh ]; do wget --timeout=5 https://raw.githubusercontent.com/mstreet97/fog-n-cloud-project-unitn-2020/master/temperature.sh ;
+          done; chmod +x temperature.sh && while true; do ./temperature.sh > temperatureFile;
           mosquitto_pub -h mosquitto -t weatherStation -f temperatureFile; sleep 60; done'
