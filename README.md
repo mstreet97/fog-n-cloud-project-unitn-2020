@@ -38,6 +38,7 @@ outside
 A full scheme of the architecture can be seen below:
 
 ![image](./img/application_level_diagram.png)
+
 ![image](./img/iaas_diagram.png)
 ![image](./img/paas_diagram.png)
 
