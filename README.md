@@ -83,3 +83,17 @@ The by running:
 bash instance_creation.sh
 ```
 The actual openstack reachable server, based on ubuntu and running the mqtt subscriber, will be created. It will rely on the settings created before by the aforementioned script, and so needs to be run after it. It also contains a call to the cloud-init-mosquitto_subscriber.sh which will take care of handling and downloading all the needed dependencies and start listening for incoming mqtt messages from the appropriate PaaS address.
+
+
+## Results
+Below it is possible to see the deployments with the sensors and the mqtt-brocker on the right. On the left you can see the Openstack instance that controls the status of the brocker and the instance that represents the subscriber to the weather station, which receives updates on the weather forecast and sunrise and sunset.
+
+![image](./img/res1.png)
+
+From the Openstack instance below, it can see that, by deleting the brocker pod, it is no longer running. After a few seconds Kubernetes will bring the brocker back to a working state thanks to the replica sets.
+
+![image](./img/res2.png)
+
+Finally you can see that there is a possibility to expand the weather station by applying additional deployments. In this example an additional temperature sensor has been added.
+
+![image](./img/res3.png)
